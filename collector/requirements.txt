@@ -1,1 +1,2 @@
 influxdb-client
+asyncua==1.1.5

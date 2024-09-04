@@ -1,4 +1,22 @@
 services:
+
+  inductive:
+    image: inductiveautomation/ignition:8.1
+    ports:
+      - 9088:8088
+      - 62541:62541
+    environment:
+      - IGNITION_EDITION=edge
+      - ACCEPT_IGNITION_EULA=Y
+      - TZ=US
+      - GATEWAY_ADMIN_USERNAME=admin
+      - GATEWAY_ADMIN_PASSWORD=admin
+    command: >
+      -n docker-test
+      -a 0.0.0.0
+      -h 9088
+      -s 9043
+
   collector:
     build: ./collector
     depends_on:
