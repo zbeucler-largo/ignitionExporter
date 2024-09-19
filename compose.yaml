@@ -2,6 +2,8 @@ services:
 
   inductive:
     image: inductiveautomation/ignition:8.1
+    container_name: ignition
+    hostname: ignition
     ports:
       - 9088:8088
       - 62541:62541
@@ -16,16 +18,6 @@ services:
       -a 0.0.0.0
       -h 9088
       -s 9043
-
-  collector:
-    build: ./collector
-    depends_on:
-      - influxdb
-    environment:
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
-      - INFLUXDB_ORG=TestOrg
-      - INFLUXDB_BUCKET=TestBucket
 
   influxdb:
     image: influxdb:2.7
@@ -43,6 +35,16 @@ services:
     # volumes:
     #   - influxdb-data:/var/lib/influxdb2
 
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    hostname: telegraf
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+    depends_on:
+      - influxdb
+      - inductive
+
   # grafana:
   #   image: grafana/grafana:latest
   #   ports:
@@ -54,6 +56,7 @@ services:
   #     - GF_SECURITY_ADMIN_PASSWORD=admin
     # volumes:
     #   - grafana-data:/var/lib/grafana
+
 
 # volumes:
 #   influxdb-data:

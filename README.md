@@ -1,12 +1,18 @@
 # ignitionExporter
-A data exporter for the Ignition SCADA software
+- A OSS data historian for ignition. InfluxDB stores OPCUA data scraped by telegraf. Grafana can be used to visualize the results.
 
 
-**libs**
-- [InfluxDB python client](https://docs.influxdata.com/influxdb/cloud/api-guide/client-libraries/python/)
+## Testing
+### Ignition
+- If the ignition container's data is deleted, you need to go to `Config>OPC UA>Server Settings` and set the following settings
+    - `Endpoint Configuration>Bind Address:` `0.0.0.0`
+    - `Endpoint Configuration>Security Policies:` `None, Basic256Sha256`
+    - `Authentication> Anonymous Access Allowed:` `true`
+    - `Advanced> Expose Tag Providers:` `true`
+- Then, restart the ignition container for these settings to take effect
 
 
-## Notes
-
-- Maybe use the Groov HTTP API instead of the OPC-UA server. Figure out which has best performance
-- TODO: Also develop a prometheus exporter
+# TODO
+- [ ] Better management of shared env vars
+- [ ] Experiment with `input.opcua_listener`
+- [ ] Setup and provision grafana
