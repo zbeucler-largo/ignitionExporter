@@ -1,6 +1,6 @@
 services:
 
-  inductive:
+  ignition:
     image: inductiveautomation/ignition:8.1
     container_name: ignition
     hostname: ignition
@@ -23,38 +23,45 @@ services:
     image: influxdb:2.7
     container_name: influxdb
     hostname: influxdb
+    env_file:
+      - ./.env
     ports:
-      - "8086:8086"
+      - 8086:8086
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=user
       - DOCKER_INFLUXDB_INIT_PASSWORD=password
-      - DOCKER_INFLUXDB_INIT_ORG=TestOrg
-      - DOCKER_INFLUXDB_INIT_BUCKET=TestBucket
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_INIT_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_INIT_BUCKET}
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
     # volumes:
     #   - influxdb-data:/var/lib/influxdb2
 
   telegraf:
-    image: telegraf:latest
+    image: telegraf:1.32.0
     container_name: telegraf
     hostname: telegraf
+    env_file:
+      - ./.env
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
     depends_on:
       - influxdb
-      - inductive
+      - ignition
 
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - influxdb
-  #   environment:
-  #     - GF_SECURITY_ADMIN_USER=admin
-  #     - GF_SECURITY_ADMIN_PASSWORD=admin
-    # volumes:
+  grafana:
+    image: grafana/grafana:11.2.0-ubuntu
+    env_file:
+      - ./.env
+    ports:
+      - 3000:3000
+    depends_on:
+      - telegraf
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+    - ./grafana/provisioning/:/etc/grafana/provisioning
     #   - grafana-data:/var/lib/grafana
 
 
